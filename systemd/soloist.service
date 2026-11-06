@@ -1,0 +1,13 @@
+[Unit]
+Description=Spotify Soloist (Connect device "spotatui")
+After=pipewire.service pipewire-pulse.service
+Wants=pipewire.service
+
+[Service]
+EnvironmentFile=%h/.config/soloist/env
+ExecStart=%h/.local/bin/soloist -n spotatui -k ${SOLOIST_API_KEY} -D %h/.local/state/spotatui/soloist -C %h/.cache/spotatui/soloist -z 2048 -i 44 -w 127.0.0.1:0
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

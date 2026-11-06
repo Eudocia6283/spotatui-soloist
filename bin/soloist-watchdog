@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Keep the Soloist Connect device usable: restart it if its control socket is
+# gone, and re-activate it when Spotify has no active device at all.
+set -u
+S="$HOME/.local/state/spotatui/soloist"
+ctl() { "$HOME/.local/bin/soloist" ctl -D "$S" "$@"; }
+
+status=$(ctl status 2>&1)
+if ! grep -q 'ws: listening' <<<"$status" || grep -q 'logged in: no' <<<"$status"; then
+    echo "soloist unhealthy, restarting: $status"
+    systemctl --user restart soloist
+    exit 0
+fi
+
+grep -q 'active device: yes' <<<"$status" && exit 0
+
+# Don't steal playback from another device (phone, desktop app, ...)
+if ! spotatui pb -s -f '%d' >/dev/null 2>&1; then
+    echo "no active Spotify device, activating soloist"
+    ctl activate
+fi

@@ -1,0 +1,9 @@
+[Unit]
+Description=Re-activate Soloist when it drops off Spotify Connect
+After=soloist.service
+Requisite=soloist.service
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:/usr/bin
+ExecStart=%h/.local/bin/soloist-watchdog
